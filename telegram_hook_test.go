@@ -1,25 +1,24 @@
-package telegram_hook_test
+package telegram_hook
 
 import (
 	"os"
 	"testing"
 
-	"github.com/rossmcdonald/telegram_hook"
 	log "github.com/sirupsen/logrus"
 )
 
 func TestNewHook(t *testing.T) {
-	_, err := telegram_hook.NewTelegramHook("", "", "")
+	_, err := NewTelegramHook("", "", "")
 	if err == nil {
 		t.Errorf("No error on invalid Telegram API token.")
 	}
 
-	_, err = telegram_hook.NewTelegramHook("", os.Getenv("TELEGRAM_TOKEN"), "")
+	_, err = NewTelegramHook("", os.Getenv("TELEGRAM_TOKEN"), "")
 	if err != nil {
 		t.Fatalf("Error on valid Telegram API token: %s", err)
 	}
 
-	h, _ := telegram_hook.NewTelegramHook("testing", os.Getenv("TELEGRAM_TOKEN"), os.Getenv("TELEGRAM_TARGET"))
+	h, _ := NewTelegramHook("testing", os.Getenv("TELEGRAM_TOKEN"), os.Getenv("TELEGRAM_TARGET"))
 	if err != nil {
 		t.Fatalf("Error on valid Telegram API token and target: %s", err)
 	}
