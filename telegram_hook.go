@@ -185,6 +185,12 @@ func (hook *TelegramHook) createMessage(entry *logrus.Entry) string {
 		msg = "<b>FATAL</b>"
 	case logrus.ErrorLevel:
 		msg = "<b>ERROR</b>"
+	case logrus.WarnLevel:
+		msg = "<b>WARNING</b>"
+	case logrus.InfoLevel:
+		msg = "<b>INFO</b>"
+	case logrus.DebugLevel:
+		msg = "<b>DEBUG</b>"
 	}
 
 	msg = strings.Join([]string{msg, hook.AppName}, "@")
