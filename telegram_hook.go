@@ -15,11 +15,12 @@ import (
 // TelegramHook to send logs via the Telegram API.
 type TelegramHook struct {
 	AppName     string
+	Level       logrus.Level
 	c           *http.Client
 	authToken   string
 	targetID    string
 	apiEndpoint string
-	async bool
+	async       bool
 }
 
 // apiRequest encapsulates the request structure we are sending to the
@@ -58,11 +59,12 @@ func NewTelegramHookWithClient(appName, authToken, targetID string, client *http
 	)
 	h := TelegramHook{
 		AppName:     appName,
+		Level:		 logrus.ErrorLevel,
 		c:           client,
 		authToken:   authToken,
 		targetID:    targetID,
 		apiEndpoint: apiEndpoint,
-		async: false,
+		async:       false,
 	}
 
 	for _, c := range config {
@@ -198,6 +200,10 @@ func (hook *TelegramHook) createMessage(entry *logrus.Entry) string {
 
 // Fire emits a log message to the Telegram API.
 func (hook *TelegramHook) Fire(entry *logrus.Entry) error {
+	if !hook.checkLevel(entry.Level) {
+		return nil
+	}
+
 	msg := hook.createMessage(entry)
 
 	if hook.async {
@@ -216,9 +222,10 @@ func (hook *TelegramHook) Fire(entry *logrus.Entry) error {
 
 // Levels returns the log levels that the hook should be enabled for.
 func (hook *TelegramHook) Levels() []logrus.Level {
-	return []logrus.Level{
-		logrus.ErrorLevel,
-		logrus.FatalLevel,
-		logrus.PanicLevel,
-	}
+	// We check the log level every time since we want to be able to change it but logrus only asks once.
+	return logrus.AllLevels
+}
+
+func (hook *TelegramHook) checkLevel(level logrus.Level) bool {
+	return hook.Level >= level
 }
