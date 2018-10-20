@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"html"
 	"net/http"
 	"os"
 	"strings"
@@ -196,12 +197,11 @@ func (hook *TelegramHook) createMessage(entry *logrus.Entry) string {
 	msg = strings.Join([]string{msg, hook.AppName}, "@")
 	msg = strings.Join([]string{msg, entry.Message}, " - ")
 	if len(entry.Data) > 0 {
-		fields, err := json.MarshalIndent(entry.Data, "", "\t")
-		if err == nil {
-			msg = strings.Join([]string{msg, "<pre>"}, "\n")
-			msg = strings.Join([]string{msg, string(fields)}, "\n")
-			msg = strings.Join([]string{msg, "</pre>"}, "\n")
+		msg = strings.Join([]string{msg, "<pre>"}, "\n")
+		for k, v := range entry.Data {
+			msg = strings.Join([]string{msg, html.EscapeString(fmt.Sprintf("\t%s: %+v", k, v))}, "\n")
 		}
+		msg = strings.Join([]string{msg, "</pre>"}, "\n")
 	}
 	return msg
 }
